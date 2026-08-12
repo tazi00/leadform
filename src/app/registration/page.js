@@ -73,12 +73,12 @@ export default function RegistrationPage() {
         </div>
 
         <div className={styles.formTitle}>
-          Computer Training Registration Form
+          Course Registration Form
         </div>
 
         {/* Name */}
         <div className={styles.formRow}>
-          <label>Name</label>
+          <label>* Name</label>
           <div className={styles.inputGroup3}>
             <div>
               <input
@@ -118,7 +118,7 @@ export default function RegistrationPage() {
         {/* Phone and Gender */}
         <div className={styles.inputRowHalf}>
           <div>
-            <label>Phone Number</label>
+            <label>* Phone Number</label>
             <input
               className={styles.input}
               type="tel"
@@ -176,7 +176,7 @@ export default function RegistrationPage() {
 
         {/* Course */}
         <div className={styles.formRow}>
-          <label>Select course you want to enroll in:</label>
+          <label>* Select course you want to enroll in:</label>
           <select
             className={styles.select}
             required
@@ -214,7 +214,7 @@ export default function RegistrationPage() {
               checked={form.agreeFees}
               onChange={(e) => update("agreeFees", e.target.checked)}
             />
-            I understand that course fees are non-refundable once the batch
+            * I understand that course fees are non-refundable once the batch
             has started.
           </label>
           <label className={styles.checkboxItem}>
@@ -224,7 +224,7 @@ export default function RegistrationPage() {
               checked={form.agreeTerms}
               onChange={(e) => update("agreeTerms", e.target.checked)}
             />
-            I agree to the Terms &amp; Conditions.
+            * I agree to the Terms &amp; Conditions.
           </label>
 
           <button
