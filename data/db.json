@@ -1,0 +1,52 @@
+{
+  "submissions": [
+    {
+      "id": "mspt4incxomlp",
+      "createdAt": "2026-08-12T08:08:09.576Z",
+      "exported": true,
+      "type": "registration",
+      "firstName": "DDDDD",
+      "middleName": "DE",
+      "lastName": "FVFE",
+      "phone": "DWDWDW",
+      "gender": "Female",
+      "addressLine1": "DDDD",
+      "addressLine2": "DFGGGG",
+      "course": "Crystal Healing",
+      "agreeFees": true,
+      "agreeTerms": true
+    },
+    {
+      "id": "mspt3y6756txx",
+      "createdAt": "2026-08-12T08:07:43.039Z",
+      "exported": true,
+      "type": "registration",
+      "firstName": "SHANTU",
+      "middleName": "III",
+      "lastName": "NAMBI",
+      "phone": "2221212221",
+      "gender": "Male",
+      "addressLine1": "DHHDWHWNDNW",
+      "addressLine2": "DEDWWDWDW",
+      "course": "Angel Therapy Level 2",
+      "agreeFees": true,
+      "agreeTerms": true
+    },
+    {
+      "id": "mspt37y85pth6",
+      "createdAt": "2026-08-12T08:07:09.056Z",
+      "exported": true,
+      "type": "registration",
+      "firstName": "tushar",
+      "middleName": "---",
+      "lastName": "dutta",
+      "phone": "7878787788",
+      "gender": "Male",
+      "addressLine1": "DDDDD",
+      "addressLine2": "DDDDDD",
+      "course": "Angel Therapy Level 1",
+      "agreeFees": true,
+      "agreeTerms": true
+    }
+  ]
+}
