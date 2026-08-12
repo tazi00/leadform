@@ -84,6 +84,7 @@ export default function RegistrationPage() {
               <input
                 className={styles.input}
                 type="text"
+                placeholder="First Name"
                 required
                 value={form.firstName}
                 onChange={(e) => update("firstName", e.target.value)}
@@ -94,6 +95,7 @@ export default function RegistrationPage() {
               <input
                 className={styles.input}
                 type="text"
+                placeholder="Middle Name"
                 value={form.middleName}
                 onChange={(e) => update("middleName", e.target.value)}
               />
@@ -103,6 +105,7 @@ export default function RegistrationPage() {
               <input
                 className={styles.input}
                 type="text"
+                placeholder="Last Name"
                 required
                 value={form.lastName}
                 onChange={(e) => update("lastName", e.target.value)}
