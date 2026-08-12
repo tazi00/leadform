@@ -73,7 +73,7 @@ export default function RegistrationPage() {
         </div>
 
         <div className={styles.formTitle}>
-          Course Registration Form
+          Computer Training Registration Form
         </div>
 
         {/* Name */}
@@ -84,8 +84,8 @@ export default function RegistrationPage() {
               <input
                 className={styles.input}
                 type="text"
-                placeholder="First Name"
                 required
+                placeholder="First Name"
                 value={form.firstName}
                 onChange={(e) => update("firstName", e.target.value)}
               />
@@ -105,8 +105,8 @@ export default function RegistrationPage() {
               <input
                 className={styles.input}
                 type="text"
-                placeholder="Last Name"
                 required
+                placeholder="Last Name"
                 value={form.lastName}
                 onChange={(e) => update("lastName", e.target.value)}
               />
@@ -186,8 +186,10 @@ export default function RegistrationPage() {
             <option value="" disabled>
               Please Select
             </option>
-            <option>Angel Therapy Level 1</option>
-            <option>Angel Therapy Level 2</option>
+            <option>Angel Therapy Basic | Online</option>
+            <option>Angel Therapy Advance | Online</option>
+            <option>Angel Therapy Basic | Offline</option>
+            <option>Angel Therapy Advance | Offline</option>
             <option>Crystal Healing</option>
             <option>Holy Fire Reiki Level 1</option>
             <option>Holy Fire Reiki Level 2</option>
@@ -254,20 +256,93 @@ export default function RegistrationPage() {
             </button>
             <h3>Terms &amp; Conditions</h3>
             <div className={styles.modalContent}>
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                do eiusmod tempor incididunt ut labore et dolore magna
-                aliqua.
-                <br />
-                <br />
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                irure dolor in reprehenderit in voluptate velit esse cillum
-                dolore eu fugiat nulla pariatur.
-                <br />
-                <br />
-                Excepteur sint occaecat cupidatat non proident, sunt in culpa
-                qui officia deserunt mollit anim id est laborum.
+              <p className={styles.tcIntro}>
+                ASTROBOOK – Course Registration Terms &amp; Conditions
+              </p>
+              <ol className={styles.tcList}>
+                <li>
+                  <strong>Seat Booking:</strong> Students may reserve their
+                  seat in a course by paying a minimum ₹499/- seat-booking
+                  amount. The seat will be considered confirmed only after
+                  successful receipt of the booking payment.
+                </li>
+                <li>
+                  <strong>Non-Refundable Booking Amount:</strong> The ₹499/-
+                  seat-booking amount is strictly non-refundable under any
+                  circumstances once the seat has been confirmed.
+                </li>
+                <li>
+                  <strong>Balance Course Fee:</strong> The remaining course
+                  fee must be paid on or before the course commencement date.
+                  A student will not be permitted to attend the course until
+                  the applicable balance fee has been paid.
+                </li>
+                <li>
+                  <strong>Cancellation by Student:</strong> If a student
+                  cancels their admission after booking the seat, the ₹499/-
+                  booking amount will not be refunded.
+                </li>
+                <li>
+                  <strong>Absence from Course:</strong> If a student fails to
+                  attend the course after confirming their admission, the
+                  paid amount will not be refundable.
+                </li>
+                <li>
+                  <strong>Course Commencement:</strong> Once the
+                  course/batch has commenced, the course fee, including any
+                  amount already paid, will be non-refundable.
+                </li>
+                <li>
+                  <strong>Batch Change:</strong> Any request to change the
+                  batch or course date will be subject to ASTROBOOK&apos;s
+                  availability and approval. ASTROBOOK may charge an
+                  applicable administrative or rescheduling fee where
+                  required.
+                </li>
+                <li>
+                  <strong>Non-Payment of Balance:</strong> If the remaining
+                  course fee is not paid by the course commencement date,
+                  ASTROBOOK reserves the right to cancel or withhold the
+                  student&apos;s admission/participation in the course. The
+                  ₹499/- booking amount will remain non-refundable.
+                </li>
+                <li>
+                  <strong>Course Materials &amp; Certification:</strong>{" "}
+                  Course materials, recordings (if applicable), certificates
+                  and other benefits will be provided according to the
+                  specific course structure and eligibility requirements.
+                </li>
+                <li>
+                  <strong>Course Content:</strong> Course content, schedule,
+                  trainer, duration and delivery format may be modified by
+                  ASTROBOOK when reasonably necessary. Students will be
+                  informed of any significant changes.
+                </li>
+                <li>
+                  <strong>No Guarantee of Personal Results:</strong>{" "}
+                  ASTROBOOK&apos;s courses are intended for educational,
+                  spiritual and personal-development purposes. ASTROBOOK
+                  does not guarantee any specific financial, professional,
+                  relationship, healing or other personal outcome from
+                  completing a course.
+                </li>
+                <li>
+                  <strong>Student Information:</strong> Students are
+                  responsible for providing accurate name, contact details
+                  and other registration information. Incorrect information
+                  may affect communication, certification or course records.
+                </li>
+                <li>
+                  <strong>Terms Acceptance:</strong> By submitting the
+                  registration form and/or making the seat-booking payment,
+                  the student confirms that they have read, understood and
+                  agreed to these Terms &amp; Conditions.
+                </li>
+              </ol>
+              <p className={styles.tcImportant}>
+                <strong>Important:</strong> Please make sure you are able to
+                attend the selected batch before booking your seat, as the
+                ₹499/- seat-booking amount is non-refundable.
               </p>
             </div>
             <button

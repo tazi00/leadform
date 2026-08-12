@@ -224,7 +224,7 @@
   font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: 0.01em;
-  min-width: 160px;
+  min-width: 100%;
   cursor: pointer;
   margin-top: 18px;
   box-shadow: 0 8px 24px rgba(157, 3, 153, 0.35);
@@ -317,6 +317,58 @@
   margin-bottom: 20px;
 }
 
+.tcIntro {
+  font-weight: 700;
+  color: #f4f2ff;
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
+
+.tcList {
+  list-style: none;
+  counter-reset: tc-counter;
+  padding: 0;
+  margin: 0 0 16px;
+}
+
+.tcList li {
+  counter-increment: tc-counter;
+  position: relative;
+  padding-left: 28px;
+  margin-bottom: 12px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.tcList li::before {
+  content: counter(tc-counter) ".";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #d8b4fe;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.tcList li strong {
+  color: #f4f2ff;
+}
+
+.tcImportant {
+  background: rgba(192, 38, 211, 0.12);
+  border: 1px solid rgba(192, 38, 211, 0.3);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  color: #f0d9ff;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.tcImportant strong {
+  color: #ffffff;
+}
+
 .modalCloseBtn {
   display: inline-block;
   background: linear-gradient(135deg, #c026d3, #6d28d9);
@@ -329,6 +381,7 @@
   transition: filter 0.2s;
   font-size: 0.9rem;
   cursor: pointer;
+  width: 100%;
 }
 .modalCloseBtn:hover {
   filter: brightness(1.1);
