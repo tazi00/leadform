@@ -73,7 +73,7 @@ export default function RegistrationPage() {
         </div>
 
         <div className={styles.formTitle}>
-          Computer Training Registration Form
+          Course Registration Form
         </div>
 
         {/* Name */}
@@ -85,6 +85,7 @@ export default function RegistrationPage() {
                 className={styles.input}
                 type="text"
                 required
+                placeholder="First Name"
                 value={form.firstName}
                 onChange={(e) => update("firstName", e.target.value)}
               />
@@ -94,7 +95,9 @@ export default function RegistrationPage() {
               <input
                 className={styles.input}
                 type="text"
+                placeholder="Middle Name"
                 value={form.middleName}
+
                 onChange={(e) => update("middleName", e.target.value)}
               />
               <span>Middle Name</span>
@@ -104,6 +107,7 @@ export default function RegistrationPage() {
                 className={styles.input}
                 type="text"
                 required
+                placeholder="Last Name"
                 value={form.lastName}
                 onChange={(e) => update("lastName", e.target.value)}
               />
@@ -180,12 +184,23 @@ export default function RegistrationPage() {
             value={form.course}
             onChange={(e) => update("course", e.target.value)}
           >
-            <option value="" disabled>
+           <option value="" disabled>
               Please Select
             </option>
-            <option>Computer Basics</option>
-            <option>Web Development</option>
-            <option>Graphic Design</option>
+            <option>Angel Therapy Level 1</option>
+            <option>Angel Therapy Level 2</option>
+            <option>Crystal Healing</option>
+            <option>Holy Fire Reiki Level 1</option>
+            <option>Holy Fire Reiki Level 2</option>
+            <option>Tarot Card Reading</option>
+            <option>Lama Fera Healing</option>
+            <option>Black Magic Removal Course</option>
+            <option>Pendulum Dowsing</option>
+            <option>Numerology</option>
+            <option>Akashic Records</option>
+            <option>Vastu</option>
+            <option>Astrology Basic</option>
+            <option>Astrology Advanced</option>
           </select>
         </div>
 
