@@ -16,8 +16,60 @@ const initialForm = {
   agreeTerms: false,
 };
 
+const Required = () => (
+  <span style={{ color: "#f87171", marginRight: "3px" }}>*</span>
+);
+
+function fieldErrorStyle(hasError) {
+  return hasError
+    ? { borderColor: "#f87171", boxShadow: "0 0 0 3px rgba(248, 113, 113, 0.15)" }
+    : undefined;
+}
+
+function validateForm(f) {
+  const errors = {};
+
+  if (!f.firstName.trim()) {
+    errors.firstName = "First name is required.";
+  } else if (f.firstName.trim().length < 2) {
+    errors.firstName = "First name looks too short.";
+  }
+
+  if (!f.lastName.trim()) {
+    errors.lastName = "Last name is required.";
+  } else if (f.lastName.trim().length < 2) {
+    errors.lastName = "Last name looks too short.";
+  }
+
+  const digitsOnly = f.phone.replace(/\D/g, "");
+  if (!f.phone.trim()) {
+    errors.phone = "Phone number is required.";
+  } else if (!/^[6-9]\d{9}$/.test(digitsOnly.slice(-10)) || digitsOnly.length < 10) {
+    errors.phone = "Enter a valid 10-digit mobile number.";
+  }
+
+  if (!f.gender) {
+    errors.gender = "Please select your gender.";
+  }
+
+  if (!f.course) {
+    errors.course = "Please select a course.";
+  }
+
+  if (!f.agreeFees) {
+    errors.agreeFees = "Please accept this to continue.";
+  }
+
+  if (!f.agreeTerms) {
+    errors.agreeTerms = "Please agree to the Terms & Conditions.";
+  }
+
+  return errors;
+}
+
 export default function RegistrationPage() {
   const [form, setForm] = useState(initialForm);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [showTerms, setShowTerms] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -25,13 +77,27 @@ export default function RegistrationPage() {
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
-    setSubmitting(true);
 
+    const errors = validateForm(form);
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      setError("Please fix the highlighted fields before submitting.");
+      return;
+    }
+
+    setSubmitting(true);
     try {
       const res = await fetch("/api/registration", {
         method: "POST",
@@ -55,6 +121,7 @@ export default function RegistrationPage() {
   function closeThankYou() {
     setShowThankYou(false);
     setForm(initialForm);
+    setFieldErrors({});
   }
 
   return (
@@ -62,7 +129,7 @@ export default function RegistrationPage() {
       <div className={`${styles.glow} ${styles.glowOne}`} />
       <div className={`${styles.glow} ${styles.glowTwo}`} />
 
-      <form className={styles.formContainer} onSubmit={handleSubmit}>
+      <form className={styles.formContainer} onSubmit={handleSubmit} noValidate>
         <div className={styles.logoWrap}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -73,18 +140,21 @@ export default function RegistrationPage() {
         </div>
 
         <div className={styles.formTitle}>
-          Course Registration Form
+          Computer Training Registration Form
         </div>
 
         {/* Name */}
         <div className={styles.formRow}>
-          <label>* Name</label>
+          <label>
+            <Required />
+            Name
+          </label>
           <div className={styles.inputGroup3}>
             <div>
               <input
                 className={styles.input}
+                style={fieldErrorStyle(fieldErrors.firstName)}
                 type="text"
-                required
                 placeholder="First Name"
                 value={form.firstName}
                 onChange={(e) => update("firstName", e.target.value)}
@@ -104,8 +174,8 @@ export default function RegistrationPage() {
             <div>
               <input
                 className={styles.input}
+                style={fieldErrorStyle(fieldErrors.lastName)}
                 type="text"
-                required
                 placeholder="Last Name"
                 value={form.lastName}
                 onChange={(e) => update("lastName", e.target.value)}
@@ -113,29 +183,44 @@ export default function RegistrationPage() {
               <span>Last Name</span>
             </div>
           </div>
+          {(fieldErrors.firstName || fieldErrors.lastName) && (
+            <p className={styles.errorText}>
+              {fieldErrors.firstName || fieldErrors.lastName}
+            </p>
+          )}
         </div>
 
         {/* Phone and Gender */}
         <div className={styles.inputRowHalf}>
           <div>
-            <label>* Phone Number</label>
+            <label>
+              <Required />
+              Phone Number
+            </label>
             <input
               className={styles.input}
+              style={fieldErrorStyle(fieldErrors.phone)}
               type="tel"
               placeholder="(000) 000-0000"
-              required
               value={form.phone}
               onChange={(e) => update("phone", e.target.value)}
             />
-            <span className={styles.helperText}>
-              Please enter a valid phone number.
-            </span>
+            {fieldErrors.phone ? (
+              <p className={styles.errorText}>{fieldErrors.phone}</p>
+            ) : (
+              <span className={styles.helperText}>
+                Please enter a valid 10-digit mobile number.
+              </span>
+            )}
           </div>
           <div>
-            <label>Gender</label>
+            <label>
+              <Required />
+              Gender
+            </label>
             <select
               className={styles.select}
-              required
+              style={fieldErrorStyle(fieldErrors.gender)}
               value={form.gender}
               onChange={(e) => update("gender", e.target.value)}
             >
@@ -147,6 +232,9 @@ export default function RegistrationPage() {
               <option>Other</option>
               <option>Prefer not to say</option>
             </select>
+            {fieldErrors.gender && (
+              <p className={styles.errorText}>{fieldErrors.gender}</p>
+            )}
           </div>
         </div>
 
@@ -176,10 +264,13 @@ export default function RegistrationPage() {
 
         {/* Course */}
         <div className={styles.formRow}>
-          <label>* Select course you want to enroll in:</label>
+          <label>
+            <Required />
+            Select course you want to enroll in:
+          </label>
           <select
             className={styles.select}
-            required
+            style={fieldErrorStyle(fieldErrors.course)}
             value={form.course}
             onChange={(e) => update("course", e.target.value)}
           >
@@ -203,6 +294,9 @@ export default function RegistrationPage() {
             <option>Astrology Basic</option>
             <option>Astrology Advanced</option>
           </select>
+          {fieldErrors.course && (
+            <p className={styles.errorText}>{fieldErrors.course}</p>
+          )}
         </div>
 
         {/* Checkboxes */}
@@ -210,22 +304,31 @@ export default function RegistrationPage() {
           <label className={styles.checkboxItem}>
             <input
               type="checkbox"
-              required
               checked={form.agreeFees}
               onChange={(e) => update("agreeFees", e.target.checked)}
             />
-            * I understand that course fees are non-refundable once the batch
-            has started.
+            <span>
+              <Required />I understand that course fees are non-refundable
+              once the batch has started.
+            </span>
           </label>
+          {fieldErrors.agreeFees && (
+            <p className={styles.errorText}>{fieldErrors.agreeFees}</p>
+          )}
+
           <label className={styles.checkboxItem}>
             <input
               type="checkbox"
-              required
               checked={form.agreeTerms}
               onChange={(e) => update("agreeTerms", e.target.checked)}
             />
-            * I agree to the Terms &amp; Conditions.
+            <span>
+              <Required />I agree to the Terms &amp; Conditions.
+            </span>
           </label>
+          {fieldErrors.agreeTerms && (
+            <p className={styles.errorText}>{fieldErrors.agreeTerms}</p>
+          )}
 
           <button
             type="button"
