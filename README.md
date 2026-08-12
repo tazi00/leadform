@@ -7,17 +7,40 @@ Chota, simple Next.js project:
 4. "Export to Google Sheet" button dabate hi sirf **naye (not-yet-exported)**
    entries Google Sheet mein append ho jaati hain.
 
-## Run locally
+## Deploy on Vercel
+
+1. Code ko GitHub repo mein push karo.
+2. [vercel.com](https://vercel.com) pe jao → "Add New Project" → apna repo import karo.
+3. **Database setup** — Project ke "Storage" tab mein jao → "Create Database" →
+   "Postgres" (Neon-powered, free tier) select karo → connect karo. Vercel
+   khud `POSTGRES_URL` env var add kar dega, koi manual copy-paste nahi
+   chahiye. (Ya chaho to Neon/Supabase khud se bhi connect kar sakte ho —
+   bas `DATABASE_URL` env var mein connection string daal dena.)
+4. Project ke "Settings" → "Environment Variables" mein baaki 4 add karo:
+   - `ADMIN_PASSWORD`
+   - `GOOGLE_CLIENT_EMAIL`
+   - `GOOGLE_PRIVATE_KEY` (poori value, quotes ke andar, `\n` waisa hi rehne do)
+   - `GOOGLE_SHEET_ID`
+5. "Deploy" dabao. Table (`submissions`) khud-ba-khud ban jaayegi pehli
+   request pe — koi migration script chalane ki zarurat nahi.
+
+Deploy hone ke baad `/registration` pe ek test entry daal ke `/admin` mein
+check kar lena ki data aa raha hai, phir export try karna.
+
+## Local development
 
 ```bash
 npm install
-cp .env.example .env.local   # fir values fill karo (neeche steps hain)
-npm run dev
+cp .env.example .env.local
 ```
 
-- Form: http://localhost:3000
-- Admin: http://localhost:3000/admin (login page pe redirect hoga)
-- Default admin password: `admin123` (ADMIN_PASSWORD env var se change karo)
+Local testing ke liye `DATABASE_URL` mein koi bhi Postgres connection string
+daal do — same Vercel Postgres wali bhi use kar sakte ho (internet pe
+accessible hoti hai), ya apne machine pe local Postgres chala lo.
+
+```bash
+npm run dev
+```
 
 ## Google Sheets export setup (one-time, ~5 min)
 
@@ -45,23 +68,21 @@ npm run dev
 Bas itna hi. Ab admin panel se "Export to Google Sheet" dabaoge to
 sirf naye entries hi jayenge — same entry dobara export nahi hogi.
 
-## Deploy note (VPS / PM2 setup)
+## Deploy note (VPS / PM2 setup — alternative to Vercel)
 
-Since tum already PM2 + Nginx use karte ho (etcrm.ddns.net jaisa),
-same pattern follow kar sakte ho:
+Agar Vercel ki jagah apne VPS pe hi rakhna ho (PM2 + Nginx), to code same
+rahega bas `DATABASE_URL` ko apni Postgres instance (RDS, ya VPS pe khud
+chalayi hui Postgres) se point kar dena:
 
 ```bash
 npm run build
 pm2 start npm --name "leadform" -- start
 ```
 
-`data/db.json` file-based storage hai — agar high-traffic/production
-use hoga to isse Postgres/SQLite mein migrate karna better rahega,
-lekin chote lead-gen forms ke liye ye kaafi hai.
 
 ## Tech stack
 
 - Next.js 15 (App Router) + Tailwind
-- lowdb — simple JSON file storage for submissions
-- googleapis — Google Sheets API export
+- Postgres (via `pg`) — works with Vercel Postgres, Neon, Supabase, or any Postgres instance
+- googleapis — Google Sheets API export, auto-creates one tab per course
 - Cookie-based simple admin auth (single shared password)

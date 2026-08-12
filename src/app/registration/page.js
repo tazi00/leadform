@@ -59,9 +59,17 @@ export default function RegistrationPage() {
 
   return (
     <div className={styles.page}>
+      <div className={`${styles.glow} ${styles.glowOne}`} />
+      <div className={`${styles.glow} ${styles.glowTwo}`} />
+
       <form className={styles.formContainer} onSubmit={handleSubmit}>
-        <div className={styles.formHeaderImg}>
-          [Computer Training Image Placeholder]
+        <div className={styles.logoWrap}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/logo-white.svg"
+            alt="AstroBook"
+            className={styles.logo}
+          />
         </div>
 
         <div className={styles.formTitle}>
@@ -175,20 +183,9 @@ export default function RegistrationPage() {
             <option value="" disabled>
               Please Select
             </option>
-            <option>Angel Therapy Level 1</option>
-            <option>Angel Therapy Level 2</option>
-            <option>Crystal Healing</option>
-            <option>Holy Fire Reiki Level 1</option>
-            <option>Holy Fire Reiki Level 2</option>
-            <option>Tarot Card Reading</option>
-            <option>Lama Fera Healing</option>
-            <option>Black Magic Removal Course</option>
-            <option>Pendulum Dowsing</option>
-            <option>Numerology</option>
-            <option>Akashic Records</option>
-            <option>Vastu</option>
-            <option>Astrology Basic</option>
-            <option>Astrology Advanced</option>
+            <option>Computer Basics</option>
+            <option>Web Development</option>
+            <option>Graphic Design</option>
           </select>
         </div>
 
@@ -201,8 +198,8 @@ export default function RegistrationPage() {
               checked={form.agreeFees}
               onChange={(e) => update("agreeFees", e.target.checked)}
             />
-            I understand that course fees are non-refundable once the batch has
-            started.
+            I understand that course fees are non-refundable once the batch
+            has started.
           </label>
           <label className={styles.checkboxItem}>
             <input
@@ -225,21 +222,14 @@ export default function RegistrationPage() {
 
         {error && <p className={styles.errorText}>{error}</p>}
 
-        <button
-          type="submit"
-          className={styles.submitBtn}
-          disabled={submitting}
-        >
+        <button type="submit" className={styles.submitBtn} disabled={submitting}>
           {submitting ? "Submitting..." : "Submit Form"}
         </button>
       </form>
 
       {/* Terms & Conditions Modal */}
       {showTerms && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setShowTerms(false)}
-        >
+        <div className={styles.modalOverlay} onClick={() => setShowTerms(false)}>
           <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
             <button
               className={styles.modalCloseIcon}
@@ -251,14 +241,15 @@ export default function RegistrationPage() {
             <h3>Terms &amp; Conditions</h3>
             <div className={styles.modalContent}>
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                do eiusmod tempor incididunt ut labore et dolore magna
+                aliqua.
                 <br />
                 <br />
                 Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-                dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                fugiat nulla pariatur.
+                laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                irure dolor in reprehenderit in voluptate velit esse cillum
+                dolore eu fugiat nulla pariatur.
                 <br />
                 <br />
                 Excepteur sint occaecat cupidatat non proident, sunt in culpa
