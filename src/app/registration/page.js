@@ -140,7 +140,7 @@ export default function RegistrationPage() {
         </div>
 
         <div className={styles.formTitle}>
-          Computer Training Registration Form
+          Course Registration Form
         </div>
 
         {/* Name */}
