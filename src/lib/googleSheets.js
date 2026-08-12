@@ -17,6 +17,18 @@ function getAuth() {
   });
 }
 
+function getSpreadsheetId() {
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+  if (!spreadsheetId) {
+    throw new Error("Missing GOOGLE_SHEET_ID in .env.local");
+  }
+  return spreadsheetId;
+}
+
+function getSheetsClient() {
+  return google.sheets({ version: "v4", auth: getAuth() });
+}
+
 // Google Sheets tab names can't contain: : \ / ? * [ ]  and max 100 chars
 function sanitizeTabName(name) {
   const cleaned = (name || "General")
@@ -28,22 +40,26 @@ function sanitizeTabName(name) {
 
 const HEADER_ROW = ["Date", "Name", "Phone", "Gender", "Address", "Course"];
 
-async function ensureTabExists(sheets, spreadsheetId, tabName) {
+async function getSpreadsheetMeta(sheets, spreadsheetId) {
   const meta = await sheets.spreadsheets.get({ spreadsheetId });
-  const existing = (meta.data.sheets || []).map(
-    (s) => s.properties.title
-  );
+  return meta.data.sheets || [];
+}
 
-  if (existing.includes(tabName)) return;
+async function ensureTabExists(sheets, spreadsheetId, tabName) {
+  const existingSheets = await getSpreadsheetMeta(sheets, spreadsheetId);
+  const found = existingSheets.find((s) => s.properties.title === tabName);
+  if (found) return found.properties.sheetId;
 
-  await sheets.spreadsheets.batchUpdate({
+  const res = await sheets.spreadsheets.batchUpdate({
     spreadsheetId,
     requestBody: {
       requests: [{ addSheet: { properties: { title: tabName } } }],
     },
   });
 
-  // Add header row to the new tab
+  const newSheetId =
+    res.data.replies[0].addSheet.properties.sheetId;
+
   await sheets.spreadsheets.values.append({
     spreadsheetId,
     range: `${tabName}!A1`,
@@ -51,35 +67,98 @@ async function ensureTabExists(sheets, spreadsheetId, tabName) {
     insertDataOption: "INSERT_ROWS",
     requestBody: { values: [HEADER_ROW] },
   });
+
+  return newSheetId;
 }
 
 /**
- * Appends rows to a sheet, grouped by course — each course gets its own tab
- * within the same spreadsheet. Creates the tab (with header row) if missing.
- * `groupedRows` = { [courseName]: [ [date, name, phone, gender, address, course], ... ] }
+ * Appends one registration directly to the sheet — creates the course's
+ * tab (with header row) if it doesn't exist yet.
  */
-export async function appendRowsByCourse(groupedRows) {
-  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-  if (!spreadsheetId) {
-    throw new Error("Missing GOOGLE_SHEET_ID in .env.local");
-  }
+export async function appendRegistrationRow(course, rowValues) {
+  const spreadsheetId = getSpreadsheetId();
+  const sheets = getSheetsClient();
+  const tabName = sanitizeTabName(course);
 
-  const auth = getAuth();
-  const sheets = google.sheets({ version: "v4", auth });
+  await ensureTabExists(sheets, spreadsheetId, tabName);
 
-  for (const [course, rows] of Object.entries(groupedRows)) {
-    if (!rows.length) continue;
-    const tabName = sanitizeTabName(course);
-
-    await ensureTabExists(sheets, spreadsheetId, tabName);
-
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: `${tabName}!A1`,
-      valueInputOption: "USER_ENTERED",
-      insertDataOption: "INSERT_ROWS",
-      requestBody: { values: rows },
-    });
-  }
+  await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range: `${tabName}!A1`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [rowValues] },
+  });
 }
 
+/**
+ * Reads every course tab and returns all rows combined, newest first.
+ * Each record's `id` encodes {sheetId}:{rowNumber} so it can be deleted later.
+ */
+export async function listAllSubmissions() {
+  const spreadsheetId = getSpreadsheetId();
+  const sheets = getSheetsClient();
+  const tabs = await getSpreadsheetMeta(sheets, spreadsheetId);
+
+  const all = [];
+
+  for (const tab of tabs) {
+    const title = tab.properties.title;
+    const sheetId = tab.properties.sheetId;
+
+    const { data } = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${title}!A2:F`,
+    });
+
+    const rows = data.values || [];
+    rows.forEach((row, idx) => {
+      const rowNumber = idx + 2; // header is row 1
+      const [date, name, phone, gender, address, course] = row;
+      if (!date && !name) return; // skip blank rows
+      all.push({
+        id: `${sheetId}:${rowNumber}`,
+        createdAt: date || "",
+        name: name || "",
+        phone: phone || "",
+        gender: gender || "",
+        address: address || "",
+        course: course || title,
+      });
+    });
+  }
+
+  all.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  return all;
+}
+
+export async function deleteSubmissionRow(id) {
+  const [sheetIdStr, rowNumberStr] = String(id).split(":");
+  const sheetId = Number(sheetIdStr);
+  const rowNumber = Number(rowNumberStr);
+
+  if (!Number.isFinite(sheetId) || !Number.isFinite(rowNumber)) {
+    throw new Error("Invalid submission id");
+  }
+
+  const spreadsheetId = getSpreadsheetId();
+  const sheets = getSheetsClient();
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId,
+              dimension: "ROWS",
+              startIndex: rowNumber - 1,
+              endIndex: rowNumber,
+            },
+          },
+        },
+      ],
+    },
+  });
+}

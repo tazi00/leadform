@@ -7,15 +7,21 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [exporting, setExporting] = useState(false);
-  const [exportMsg, setExportMsg] = useState("");
+  const [error, setError] = useState("");
 
   async function load() {
     setLoading(true);
-    const res = await fetch("/api/admin/submissions");
-    const data = await res.json();
-    setSubmissions(data.submissions || []);
-    setLoading(false);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/submissions");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not load data");
+      setSubmissions(data.submissions || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -23,7 +29,7 @@ export default function AdminDashboard() {
   }, []);
 
   async function handleDelete(id) {
-    if (!confirm("Delete this entry?")) return;
+    if (!confirm("Delete this entry? This removes the row from the Google Sheet too.")) return;
     await fetch("/api/admin/submissions", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -32,35 +38,12 @@ export default function AdminDashboard() {
     load();
   }
 
-  async function handleExport() {
-    setExporting(true);
-    setExportMsg("");
-    try {
-      const res = await fetch("/api/admin/export", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Export failed");
-
-      setExportMsg(
-        data.exportedCount === 0
-          ? "Nothing new to export — sheet is already up to date."
-          : `Exported ${data.exportedCount} new entr${
-              data.exportedCount === 1 ? "y" : "ies"
-            } to Google Sheet.`
-      );
-      load();
-    } catch (err) {
-      setExportMsg(err.message);
-    } finally {
-      setExporting(false);
-    }
-  }
-
   async function handleLogout() {
     await fetch("/api/admin/login", { method: "DELETE" });
     router.push("/admin/login");
   }
 
-  const pendingCount = submissions.filter((s) => !s.exported).length;
+  const sheetUrl = process.env.NEXT_PUBLIC_GOOGLE_SHEET_URL;
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-10">
@@ -71,17 +54,26 @@ export default function AdminDashboard() {
               Registration submissions
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              {submissions.length} total &middot; {pendingCount} not yet
-              exported
+              {submissions.length} total &middot; live from Google Sheet
             </p>
           </div>
           <div className="flex gap-2">
+            {sheetUrl && (
+              <a
+                href={sheetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition"
+              >
+                Open Sheet
+              </a>
+            )}
             <button
-              onClick={handleExport}
-              disabled={exporting || pendingCount === 0}
+              onClick={load}
+              disabled={loading}
               className="rounded-lg bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-800 disabled:opacity-50 transition"
             >
-              {exporting ? "Exporting..." : `Export to Google Sheet`}
+              {loading ? "Refreshing..." : "Refresh"}
             </button>
             <button
               onClick={handleLogout}
@@ -92,9 +84,9 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {exportMsg && (
-          <div className="mb-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 text-sm">
-            {exportMsg}
+        {error && (
+          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-2 text-sm">
+            {error}
           </div>
         )}
 
@@ -115,7 +107,6 @@ export default function AdminDashboard() {
                   <th className="px-4 py-3 font-medium">Gender</th>
                   <th className="px-4 py-3 font-medium">Address</th>
                   <th className="px-4 py-3 font-medium">Course</th>
-                  <th className="px-4 py-3 font-medium">Exported</th>
                   <th className="px-4 py-3 font-medium"></th>
                 </tr>
               </thead>
@@ -123,32 +114,17 @@ export default function AdminDashboard() {
                 {submissions.map((s) => (
                   <tr key={s.id} className="border-t border-slate-100">
                     <td className="px-4 py-3 whitespace-nowrap text-slate-500">
-                      {new Date(s.createdAt).toLocaleString()}
+                      {s.createdAt ? new Date(s.createdAt).toLocaleString() : "-"}
                     </td>
                     <td className="px-4 py-3 font-medium text-slate-900">
-                      {[s.firstName, s.middleName, s.lastName]
-                        .filter(Boolean)
-                        .join(" ")}
+                      {s.name}
                     </td>
                     <td className="px-4 py-3 text-slate-700">{s.phone}</td>
                     <td className="px-4 py-3 text-slate-700">{s.gender}</td>
                     <td className="px-4 py-3 text-slate-700 max-w-xs truncate">
-                      {[s.addressLine1, s.addressLine2]
-                        .filter(Boolean)
-                        .join(", ")}
+                      {s.address}
                     </td>
                     <td className="px-4 py-3 text-slate-700">{s.course}</td>
-                    <td className="px-4 py-3">
-                      {s.exported ? (
-                        <span className="text-green-600 text-xs font-medium">
-                          Yes
-                        </span>
-                      ) : (
-                        <span className="text-amber-600 text-xs font-medium">
-                          Pending
-                        </span>
-                      )}
-                    </td>
                     <td className="px-4 py-3">
                       <button
                         onClick={() => handleDelete(s.id)}

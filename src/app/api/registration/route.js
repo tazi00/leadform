@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { addSubmission } from "@/lib/db";
+import { appendRegistrationRow } from "@/lib/googleSheets";
 
 export async function POST(req) {
   try {
@@ -31,25 +31,31 @@ export async function POST(req) {
       );
     }
 
-    const record = await addSubmission({
-      type: "registration",
-      firstName: String(firstName).trim(),
-      middleName: middleName ? String(middleName).trim() : "",
-      lastName: String(lastName).trim(),
-      phone: String(phone).trim(),
-      gender,
-      addressLine1: addressLine1 ? String(addressLine1).trim() : "",
-      addressLine2: addressLine2 ? String(addressLine2).trim() : "",
-      course,
-      agreeFees: !!agreeFees,
-      agreeTerms: !!agreeTerms,
-    });
+    const name = [firstName, middleName, lastName]
+      .filter(Boolean)
+      .map((s) => String(s).trim())
+      .join(" ");
+    const address = [addressLine1, addressLine2]
+      .filter(Boolean)
+      .map((s) => String(s).trim())
+      .join(", ");
 
-    return NextResponse.json({ ok: true, record });
+    const row = [
+      new Date().toISOString(),
+      name,
+      String(phone).trim(),
+      gender,
+      address,
+      course,
+    ];
+
+    await appendRegistrationRow(course, row);
+
+    return NextResponse.json({ ok: true });
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
+      { error: err.message || "Something went wrong. Please try again." },
       { status: 500 }
     );
   }

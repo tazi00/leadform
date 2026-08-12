@@ -73,7 +73,7 @@ export default function RegistrationPage() {
         </div>
 
         <div className={styles.formTitle}>
-          Course Registration Form
+          Computer Training Registration Form
         </div>
 
         {/* Name */}
@@ -85,7 +85,6 @@ export default function RegistrationPage() {
                 className={styles.input}
                 type="text"
                 required
-                placeholder="First Name"
                 value={form.firstName}
                 onChange={(e) => update("firstName", e.target.value)}
               />
@@ -95,9 +94,7 @@ export default function RegistrationPage() {
               <input
                 className={styles.input}
                 type="text"
-                placeholder="Middle Name"
                 value={form.middleName}
-
                 onChange={(e) => update("middleName", e.target.value)}
               />
               <span>Middle Name</span>
@@ -107,7 +104,6 @@ export default function RegistrationPage() {
                 className={styles.input}
                 type="text"
                 required
-                placeholder="Last Name"
                 value={form.lastName}
                 onChange={(e) => update("lastName", e.target.value)}
               />
@@ -184,7 +180,7 @@ export default function RegistrationPage() {
             value={form.course}
             onChange={(e) => update("course", e.target.value)}
           >
-           <option value="" disabled>
+            <option value="" disabled>
               Please Select
             </option>
             <option>Angel Therapy Level 1</option>
